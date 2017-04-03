@@ -12,26 +12,39 @@ I will be using openCV (http://opencv-python-tutroals.readthedocs.io/en/latest/p
   
   
   
-    def steganographize( image_name, message ):
-      message = txt_to_str(message)
-      raw_image = cv2.imread(image_name,cv2.IMREAD_COLOR) 
-      image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
+    binary_message = message_to_binary(message)
+    print(binary_message)
+    vals_to_change = len(binary_message)
 
-      new_image = image.copy()
-      num_rows, num_cols, num_chans = new_image.shape
-      bit_list = []
-      bin_digits = []
-      new_vals = []
+    for row in range(num_rows):
+        for col in range(num_cols):
+            r, g, b = image[row,col]
 
-      binary_message = message_to_binary(message)
-      print(binary_message)
-      vals_to_change = len(binary_message)
+            if vals_to_change >= 3:
+                r = new_r(r,binary_message)
+                binary_message = binary_message[1:]
+                g = new_g(g,binary_message)
+                binary_message = binary_message[1:]
+                b = new_b(b,binary_message)
+                binary_message = binary_message[1:]
+                vals_to_change -= 3
+            
+            elif vals_to_change == 2:
+                r = new_r(r,binary_message)
+                binary_message = binary_message[1:]
+                g = new_g(g, binary_message)
+                binary_message = binary_message[1:]
+                vals_to_change -= 2
+            
+            elif vals_to_change == 1:
+                r = new_r(r,binary_message)
+                binary_message = binary_message[1:]
+                vals_to_change -= 1
 
-      for row in range(num_rows):
-          for col in range(num_cols):
-              r, g, b = image[row,col]
-
-              ...
+            new_image[row,col] = [r,g,b]
+   
+    plt.imshow(new_image)
+    return new_image
   
   
   b. Transform message into binary. The difficult part of transforming a message is that most ASCII characters are represented in 8 bit incriments. However, special characters and punctuation are represented in 6-7 bit incriments. This will make decoding very difficult. So, I pad the ASCII characters with less than 8 bits with 2's to make sure that the decoding only has to handle 8 bit incriments. I used a dictionary, in excel, for the ASCII punctuation to binary conversion (with modification with the pads). For everything else, I just functions ord() and bin(). I convert the ASCII to its character, decimal number and then convert that into binary.(https://github.com/nlillie17/steganography/blob/master/custom_dict.png)
