@@ -10,6 +10,8 @@ I will be using openCV (http://opencv-python-tutroals.readthedocs.io/en/latest/p
 1. Encoding
   a. Using CV, transform picture into a numpy array, where each pixel is represented by it's RGB value
   
+  
+  
   def steganographize( image_name, message ):
     message = txt_to_str(message)
     raw_image = cv2.imread(image_name,cv2.IMREAD_COLOR) 
