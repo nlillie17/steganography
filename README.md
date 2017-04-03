@@ -32,7 +32,7 @@ I will be using openCV (http://opencv-python-tutroals.readthedocs.io/en/latest/p
             ...
   
   
-  b. Transform message into binary. The difficult part of transforming a message is that most ASCII characters are represented in 8 bit incriments. However, special characters and punctuation are represented in 6-7 bit incriments. This will make decoding very difficult. So, I pad the ASCII characters with less than 8 bits with 2's to make sure that the decoding only has to handle 8 bit incriments. I used a dictionary, in excel, for the ASCII punctuation to binary conversion (with modification with the pads). For everything else, I just functions ord() and bin(). I convert the ASCII to its character, decimal number and then convert that into binary.
+  b. Transform message into binary. The difficult part of transforming a message is that most ASCII characters are represented in 8 bit incriments. However, special characters and punctuation are represented in 6-7 bit incriments. This will make decoding very difficult. So, I pad the ASCII characters with less than 8 bits with 2's to make sure that the decoding only has to handle 8 bit incriments. I used a dictionary, in excel, for the ASCII punctuation to binary conversion (with modification with the pads). For everything else, I just functions ord() and bin(). I convert the ASCII to its character, decimal number and then convert that into binary.(https://github.com/nlillie17/steganography/blob/master/custom_dict.png)
   
   def message_to_binary (message):
     '''takes in a string and returns the binary representation of that string with eight 0s at the end'''
