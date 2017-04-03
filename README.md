@@ -12,78 +12,79 @@ I will be using openCV (http://opencv-python-tutroals.readthedocs.io/en/latest/p
   
   
   
-  def steganographize( image_name, message ):
-    message = txt_to_str(message)
-    raw_image = cv2.imread(image_name,cv2.IMREAD_COLOR) 
-    image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
+    def steganographize( image_name, message ):
+      message = txt_to_str(message)
+      raw_image = cv2.imread(image_name,cv2.IMREAD_COLOR) 
+      image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB)
 
-    new_image = image.copy()
-    num_rows, num_cols, num_chans = new_image.shape
-    bit_list = []
-    bin_digits = []
-    new_vals = []
+      new_image = image.copy()
+      num_rows, num_cols, num_chans = new_image.shape
+      bit_list = []
+      bin_digits = []
+      new_vals = []
 
-    binary_message = message_to_binary(message)
-    print(binary_message)
-    vals_to_change = len(binary_message)
+      binary_message = message_to_binary(message)
+      print(binary_message)
+      vals_to_change = len(binary_message)
 
-    for row in range(num_rows):
-        for col in range(num_cols):
-            r, g, b = image[row,col]
-            
-            ...
+      for row in range(num_rows):
+          for col in range(num_cols):
+              r, g, b = image[row,col]
+
+              ...
   
   
   b. Transform message into binary. The difficult part of transforming a message is that most ASCII characters are represented in 8 bit incriments. However, special characters and punctuation are represented in 6-7 bit incriments. This will make decoding very difficult. So, I pad the ASCII characters with less than 8 bits with 2's to make sure that the decoding only has to handle 8 bit incriments. I used a dictionary, in excel, for the ASCII punctuation to binary conversion (with modification with the pads). For everything else, I just functions ord() and bin(). I convert the ASCII to its character, decimal number and then convert that into binary.(https://github.com/nlillie17/steganography/blob/master/custom_dict.png)
   
-  def message_to_binary (message):
-    '''takes in a string and returns the binary representation of that string with eight 0s at the end'''
-    binary_message = ''
+  
+  
+      def message_to_binary (message):
+        binary_message = ''
 
-    for i in message:
-        binary_message += letter_to_binary(i)
-    binary_message += '00000000'
+        for i in message:
+            binary_message += letter_to_binary(i)
+        binary_message += '00000000'
 
-    return binary_message
-    
-    
-    
-    def letter_to_binary (letter):
-    '''takes in a letter and returns binary, handles some edge cases!'''
+        return binary_message
 
-    y = check_punctuation(letter)
-    if y != None:
-        return y
-    
-    else:
-        num = ord(letter)
-        binary = bin(num)
-        binary2 =''
-        for i in binary:
-            if i.isdigit():
-                binary2 += i
-        return binary2
-        
-        
-        
-     def check_punctuation (letter):
-    '''function that takes in a binary string and checks it in a excel dictionary of punctuation.
-    Makes the length of the binary, if it is punctuation, equal to 8 by appending 2'''
 
-    myfile = open('ascii_binary.csv','r')
-    reader = csv.reader(myfile)
-    
-    x = ''
-    nums_to_add = 8-len(letter)
-    if nums_to_add == 1:
-        binary += '2'
-    if nums_to_add == 2:
-        binary += '22'
-        
-    for row in reader:
-        if letter == row[0]:
-            return row[3]
-    return None
+
+        def letter_to_binary (letter):
+        '''takes in a letter and returns binary, handles some edge cases!'''
+
+        y = check_punctuation(letter)
+        if y != None:
+            return y
+
+        else:
+            num = ord(letter)
+            binary = bin(num)
+            binary2 =''
+            for i in binary:
+                if i.isdigit():
+                    binary2 += i
+            return binary2
+
+
+
+         def check_punctuation (letter):
+        '''function that takes in a binary string and checks it in a excel dictionary of punctuation.
+        Makes the length of the binary, if it is punctuation, equal to 8 by appending 2'''
+
+        myfile = open('ascii_binary.csv','r')
+        reader = csv.reader(myfile)
+
+        x = ''
+        nums_to_add = 8-len(letter)
+        if nums_to_add == 1:
+            binary += '2'
+        if nums_to_add == 2:
+            binary += '22'
+
+        for row in reader:
+            if letter == row[0]:
+                return row[3]
+        return None
     
     
   c. Once I have a list of binary, I iterate through pixels starting in the upper-left of the picture and going down each column before moving onto the next row. I strip out the last digit of each pixel and replace it with a bit from the binary list I just generated. Replacing the lowest order digit of the pixels does not noticeably change the picture, which is the point! I then pad the end of the message with eight 0s to signal message has ended.
@@ -94,29 +95,30 @@ I will be using openCV (http://opencv-python-tutroals.readthedocs.io/en/latest/p
   b. Convert binary list back into a message. Strip off the last eight zeros, iterate through list 8 bits at a time, check if punctuation and if so use custom dictionary. If not, convert to number and then convert to symbol. Output text message!
   
   
-  for row in range(num_rows):
-        for col in range(num_cols):
-            r, g, b = image[row,col]
-            binary_digits = strip_last_digit(r,g,b)
-            bit_list.extend(binary_digits)
+  
+    for row in range(num_rows):
+          for col in range(num_cols):
+              r, g, b = image[row,col]
+              binary_digits = strip_last_digit(r,g,b)
+              bit_list.extend(binary_digits)
 
-            '''if bit_list[-3] > 2:
-                bit_list = bit_list[0:-3]
-            if bit_list[-2] > 2:
-                bit_list = bit_list[0:-2]
-            if bit_list[-1] > 2:
-                bit_list = bit_list[0:-1]'''
+              '''if bit_list[-3] > 2:
+                  bit_list = bit_list[0:-3]
+              if bit_list[-2] > 2:
+                  bit_list = bit_list[0:-2]
+              if bit_list[-1] > 2:
+                  bit_list = bit_list[0:-1]'''
 
-            #print(r,g,b)
-            #print(binary_digits)
-            #print('bit list ',bit_list) 
+              #print(r,g,b)
+              #print(binary_digits)
+              #print('bit list ',bit_list) 
 
-            if bit_list[-8:-1] == [0,0,0,0,0,0,0]:
-                break
-        break
-    print('final bit list ', bit_list)
-    return message_from_bits(bit_list)
-    
+              if bit_list[-8:-1] == [0,0,0,0,0,0,0]:
+                  break
+          break
+      print('final bit list ', bit_list)
+      return message_from_bits(bit_list)
+
     
     
   
